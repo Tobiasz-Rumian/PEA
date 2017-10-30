@@ -21,38 +21,36 @@ public class XMLParserImpl implements XMLParser {
    private static final String EDGE = "edge";
    private static final String COST = "cost";
 
-   public static void main(String[] args) {
-      XMLParserImpl xmlParser = new XMLParserImpl();
-      try {
-         AdjacencyListsWithMeta list = xmlParser.getAdjacencyLists(new File("C:\\Users\\zekori96\\Documents\\Projekt pea\\src\\main\\resources\\burma14.xml"));
-         System.out.println(list.toString());
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
 
    public AdjacencyListsWithMeta getAdjacencyLists(File xmlFile) throws Exception {
-//new File("C:\\Users\\zekori96\\Documents\\Projekt pea\\src\\main\\resources\\burma14.xml")
       AdjacencyListsWithMeta list = new AdjacencyListsWithMeta();
       Document doc = createDocument(xmlFile);
       setListMeta(doc, list);
 
       NodeList vertexList = doc.getElementsByTagName(VERTEX);
       for (int currentVertexNumber = 0; currentVertexNumber < vertexList.getLength(); currentVertexNumber++) {
-         Node vertexNode = vertexList.item(currentVertexNumber);
-         if (isElement(vertexNode)) {
-            NodeList edgeList = ((Element) vertexNode).getElementsByTagName(EDGE);
-            for (int currentEdgeNumber = 0; currentEdgeNumber < edgeList.getLength(); currentEdgeNumber++) {
-               Node edgeNode = edgeList.item(currentEdgeNumber);
-               if (isElement(edgeNode)) {
-                  Double cost = Double.parseDouble(((Element) edgeNode).getAttribute(COST));
-                  Integer destinationVertexNumber = Integer.parseInt(edgeNode.getTextContent());
-                  list.addToList(currentVertexNumber, destinationVertexNumber, cost);
-               }
-            }
-         }
+         processVertex(list, vertexList, currentVertexNumber);
       }
       return list;
+   }
+
+   private void processVertex(AdjacencyListsWithMeta list, NodeList vertexList, int currentVertexNumber) {
+      Node vertexNode = vertexList.item(currentVertexNumber);
+      if (isElement(vertexNode)) {
+         NodeList edgeList = ((Element) vertexNode).getElementsByTagName(EDGE);
+         for (int currentEdgeNumber = 0; currentEdgeNumber < edgeList.getLength(); currentEdgeNumber++) {
+            processEdge(list, currentVertexNumber, edgeList, currentEdgeNumber);
+         }
+      }
+   }
+
+   private void processEdge(AdjacencyListsWithMeta list, int currentVertexNumber, NodeList edgeList, int currentEdgeNumber) {
+      Node edgeNode = edgeList.item(currentEdgeNumber);
+      if (isElement(edgeNode)) {
+         Double cost = Double.parseDouble(((Element) edgeNode).getAttribute(COST));
+         Integer destinationVertexNumber = Integer.parseInt(edgeNode.getTextContent());
+         list.addToList(currentVertexNumber, destinationVertexNumber, cost);
+      }
    }
 
    private boolean isElement(Node edgeNode) {
