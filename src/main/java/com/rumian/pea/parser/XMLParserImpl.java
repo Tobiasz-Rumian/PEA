@@ -1,6 +1,7 @@
 package com.rumian.pea.parser;
 
 import com.rumian.pea.graph.model.entity.AdjacencyListsWithMeta;
+import com.rumian.pea.graph.model.entity.AdjacencyMatrixWithMeta;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,8 +22,12 @@ public class XMLParserImpl implements XMLParser {
    private static final String EDGE = "edge";
    private static final String COST = "cost";
 
+   public AdjacencyMatrixWithMeta getAdjacencyMatrix(File xmlFile)throws Exception{
+      return getAdjacencyLists(xmlFile).toMatrix();
+   }
 
-   public AdjacencyListsWithMeta getAdjacencyLists(File xmlFile) throws Exception {
+
+   private AdjacencyListsWithMeta getAdjacencyLists(File xmlFile) throws Exception {
       AdjacencyListsWithMeta list = new AdjacencyListsWithMeta();
       Document doc = createDocument(xmlFile);
       setListMeta(doc, list);
